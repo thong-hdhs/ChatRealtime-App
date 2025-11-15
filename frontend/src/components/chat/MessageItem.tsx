@@ -40,15 +40,15 @@ const MessageItem = ({
       )}
     >
       {/* avatar */}
-      {!message.isOwn && (
+      {!message.isOwn && isGroupBreak && (
         <div className="w-8">
-          {isGroupBreak && (
+          {
             <UserAvatar
               type="chat"
               name={participant?.displayName ?? "Moji"}
               avatarUrl={participant?.avatarUrl ?? undefined}
             />
-          )}
+          }
         </div>
       )}
 
@@ -62,7 +62,7 @@ const MessageItem = ({
         <Card
           className={cn(
             "p-3",
-            message.isOwn ? "chat-bubble-sent border-0" : "bg-chat-bubble-received"
+            message.isOwn ? "chat-bubble-sent border-0" : "chat-bubble-received"
           )}
         >
           <p className="text-sm leading-relaxed break-words">{message.content}</p>

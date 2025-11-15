@@ -7,9 +7,12 @@ import ChatWindowBody from "./ChatWindowBody";
 import MessageInput from "./MessageInput";
 
 const ChatWindowLayout = () => {
-  const activeConversationId = useChatStore((s) => s.activeConversationId);
-  const conversations = useChatStore((s) => s.conversations);
-  const loading = useChatStore((s) => s.messageLoading);
+  const {
+    activeConversationId,
+    conversations,
+    messageLoading: loading,
+    messages,
+  } = useChatStore();
 
   const selectedConvo =
     conversations.find((c) => c._id === activeConversationId) ?? null;
