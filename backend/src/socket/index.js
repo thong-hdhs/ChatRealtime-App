@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
+import { socketAuthMiddleware } from "../middlewares/socketMiddleware.js";
 
 const app = express();
 
@@ -13,8 +14,12 @@ const io = new Server(server, {
   },
 });
 
+io.use(socketAuthMiddleware);
+
 io.on("connection", async (socket) => {
-  console.log(`socket connected: ${socket.id}`);
+  const user = socket.user;
+
+  console.log(`${user.displayName} online với socket ${socket.id}`);
 
   socket.on("disconnect", () => {
     console.log(`socket disconnected: ${socket.id}`);
