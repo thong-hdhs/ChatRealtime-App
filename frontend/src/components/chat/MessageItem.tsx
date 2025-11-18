@@ -40,15 +40,15 @@ const MessageItem = ({
       )}
     >
       {/* avatar */}
-      {!message.isOwn && isGroupBreak && (
+      {!message.isOwn && (
         <div className="w-8">
-          {
+          {isGroupBreak && (
             <UserAvatar
               type="chat"
               name={participant?.displayName ?? "Moji"}
               avatarUrl={participant?.avatarUrl ?? undefined}
             />
-          }
+          )}
         </div>
       )}
 
