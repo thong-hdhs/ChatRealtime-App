@@ -1,7 +1,7 @@
 import { useChatStore } from "@/stores/useChatStore";
 import ChatWelcomeScreen from "./ChatWelcomeScreen";
 import MessageItem from "./MessageItem";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 const ChatWindowBody = () => {
@@ -19,6 +19,9 @@ const ChatWindowBody = () => {
 
   const selectedConvo = conversations.find((c) => c._id === activeConversationId);
 
+  // ref
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const lastMessage = selectedConvo?.lastMessage;
     if (!lastMessage || !user?._id) {
@@ -30,6 +33,16 @@ const ChatWindowBody = () => {
 
     setLastMessageStatus([...seenBy].length > 0 ? "seen" : "delivered");
   }, [selectedConvo]);
+
+  // kéo xuống dưới khi load convo
+  useLayoutEffect(() => {
+    if (!activeConversationId) return;
+    if (!messagesEndRef.current) return;
+
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+  }, [activeConversationId]);
 
   if (!selectedConvo) {
     return <ChatWelcomeScreen />;
@@ -56,6 +69,8 @@ const ChatWindowBody = () => {
             lastMessageStatus={lastMessageStatus}
           />
         ))}
+
+        <div ref={messagesEndRef}></div>
       </div>
     </div>
   );
