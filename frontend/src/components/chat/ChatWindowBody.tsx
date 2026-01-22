@@ -2,7 +2,6 @@ import { useChatStore } from "@/stores/useChatStore";
 import ChatWelcomeScreen from "./ChatWelcomeScreen";
 import MessageItem from "./MessageItem";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useAuthStore } from "@/stores/useAuthStore";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 const ChatWindowBody = () => {
@@ -12,7 +11,6 @@ const ChatWindowBody = () => {
     messages: allMessages,
     fetchMessages,
   } = useChatStore();
-  const { user } = useAuthStore();
   const [lastMessageStatus, setLastMessageStatus] = useState<"delivered" | "seen">(
     "delivered"
   );
@@ -30,14 +28,13 @@ const ChatWindowBody = () => {
   // seen status
   useEffect(() => {
     const lastMessage = selectedConvo?.lastMessage;
-    if (!lastMessage || !user?._id) {
-      setLastMessageStatus("delivered");
+    if (!lastMessage) {
       return;
     }
 
     const seenBy = selectedConvo?.seenBy ?? [];
 
-    setLastMessageStatus([...seenBy].length > 0 ? "seen" : "delivered");
+    setLastMessageStatus(seenBy.length > 0 ? "seen" : "delivered");
   }, [selectedConvo]);
 
   // kéo xuống dưới khi load convo
