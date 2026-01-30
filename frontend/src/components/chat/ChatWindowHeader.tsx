@@ -18,11 +18,7 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
     chat = chat ?? conversations.find((c) => c._id === activeConversationId);
 
     if (!chat) {
-        return (
-            <header className="md:hidden sticky top-0 z-10 flex items-center gap-2 px-4 py-2 w-full">
-                <SidebarTrigger className="-ml-1 text-foreground" />
-            </header>
-        );
+        return null;
     }
 
     if (chat.type === "direct") {
@@ -35,12 +31,6 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
     return (
         <header className="sticky top-0 z-10 px-4 py-2 flex items-center bg-background">
             <div className="flex items-center gap-2 w-full">
-                <SidebarTrigger className="-ml-1 text-foreground" />
-                <Separator
-                    orientation="vertical"
-                    className="mr-2 data-[orientation=vertical]:h-4"
-                />
-
                 <div className="p-2 w-full flex items-center gap-3">
                     {/* avatar */}
                     <div className="relative">

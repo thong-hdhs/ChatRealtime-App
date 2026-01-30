@@ -11,10 +11,11 @@ import { protectedRoute } from "./middlewares/authMiddleware.js";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
+import path from "path";
 import { app, server } from "./socket/index.js";
 import { v2 as cloudinary } from "cloudinary";
 
-dotenv.config();
+dotenv.config({ path: "./.env" });
 
 // const app = express();
 const PORT = process.env.PORT || 5001;
@@ -24,15 +25,31 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
+// Serve uploaded files (local fallback)
+app.use(
+    "/uploads",
+    express.static(path.join(process.cwd(), "public", "uploads")),
+);
+
 // CLOUDINARY Configuration
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Log cloudinary config presence (do not log secret in production)
+console.log("Cloudinary config:", {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY
+        ? process.env.CLOUDINARY_API_KEY.slice(0, 4) + "****"
+        : null,
 });
 
 // swagger
-const swaggerDocument = JSON.parse(fs.readFileSync("./src/swagger.json", "utf8"));
+const swaggerDocument = JSON.parse(
+    fs.readFileSync("./src/swagger.json", "utf8"),
+);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -46,8 +63,15 @@ app.use("/api/friends", friendRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/conversations", conversationRoute);
 
-connectDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`server bắt đầu trên cổng ${PORT}`);
-  });
-});
+connectDB()
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(`server bắt đầu trên cổng ${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.log("Lỗi kết nối DB, nhưng server vẫn start:", error);
+        server.listen(PORT, () => {
+            console.log(`server bắt đầu trên cổng ${PORT} (không có DB)`);
+        });
+    });
